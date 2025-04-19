@@ -1,0 +1,13 @@
+import pandas as pd
+
+# Load the dataset
+data = pd.read_csv(r'Data\synthetic_fraud_detection_data.csv')
+
+# Display the first few rows
+print(data.head())
+
+# Check for missing values
+print(data.isnull().sum())
+
+# Understand the distribution of the target variable
+print(data['is_fraud'].value_counts())
