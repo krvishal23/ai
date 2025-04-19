@@ -1,0 +1,21 @@
+from sklearn.preprocessing import StandardScaler
+from imblearn.over_sampling import SMOTE
+
+# Separate features and target
+X = data.drop('is_fraud', axis=1)  # Drop the 'is_fraud' column
+y = data['is_fraud']  # Use 'is_fraud' as the target
+
+# Drop non-numeric columns (e.g., dates, IDs, etc.)
+X = X.select_dtypes(include=['float64', 'int64'])  # Keep only numeric columns
+
+# Scale the 'transaction_amount' feature (if it's numeric)
+scaler = StandardScaler()
+X['transaction_amount'] = scaler.fit_transform(X['transaction_amount'].values.reshape(-1, 1))
+
+# Address class imbalance using SMOTE
+smote = SMOTE(random_state=42)
+X_resampled, y_resampled = smote.fit_resample(X, y)
+
+# Display the resampled dataset size
+print(f"Original dataset size: {y.value_counts()}")
+print(f"Resampled dataset size: {y_resampled.value_counts()}")
