@@ -1,0 +1,43 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+import joblib
+
+# Load your data
+data = pd.read_csv(r'Data\synthetic_fraud_detection_data.csv')
+
+# Convert 'transaction_time' to datetime
+data['transaction_time'] = pd.to_datetime(data['transaction_time'])
+
+# Extract useful features from 'transaction_time'
+data['transaction_hour'] = data['transaction_time'].dt.hour
+data['transaction_day'] = data['transaction_time'].dt.day
+data['transaction_month'] = data['transaction_time'].dt.month
+data['transaction_year'] = data['transaction_time'].dt.year
+data['transaction_dayofweek'] = data['transaction_time'].dt.dayofweek
+
+# Drop the original 'transaction_time' column
+data = data.drop('transaction_time', axis=1)
+
+# Convert categorical variables to numerical using one-hot encoding
+data = pd.get_dummies(data, columns=['user_gender', 'user_location'], drop_first=True)
+
+# Separate features and target variable
+X = data.drop('is_fraud', axis=1)
+y = data['is_fraud']
+
+# Split your data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train your model (e.g., Random Forest Classifier)
+model = RandomForestClassifier(random_state=42)
+model.fit(X_train, y_train)
+
+# Evaluate the model
+y_pred = model.predict(X_test)
+print(f"Model Accuracy: {accuracy_score(y_test, y_pred)}")
+
+# Save the trained model to a file
+joblib.dump(model, 'fraud_model.pkl')
+print("Model saved successfully as 'fraud_model.pkl'")
